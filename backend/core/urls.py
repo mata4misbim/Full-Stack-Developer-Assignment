@@ -27,4 +27,7 @@ urlpatterns = [
 
     #เชื่อมเส้นทางระบบตะกร้าสินค้าเข้ามาเพิ่ม
     path('api/cart/', include('cart.urls')),
+
+    #เชื่อมเส้นทางระบบใบสั่งซื้อ (Orders) เข้ามาเป็นตัวสุดท้าย
+    path('api/orders/', include('orders.urls')),
 ]
