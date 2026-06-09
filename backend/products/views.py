@@ -16,3 +16,14 @@ class ProductListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         # บันทึกข้อมูลโดยผูกเอาไอดีของคนที่ล็อกอินสั่ง POST อยู่ขณะนั้น เป็นคนขาย (Seller) ทันที
         serializer.save(seller=self.request.user)
+
+class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+
+    def get_permissions(self):
+        # ถ้าเป็นดึงข้อมูลดูรายละเอียดสินค้ารายตัว (GET) ให้ทุกคนเข้าดูได้เลยไม่ต้องล็อกอิน
+        if self.request.method == 'GET':
+            return [permissions.AllowAny()]
+        # แต่ถ้าเป็นคนขายจะส่งมาเพื่อ 'แก้ไข' หรือ 'ลบ' สินค้าชิ้นนี้ ต้องล็อกอินก่อนเท่านั้น
+        return [permissions.IsAuthenticated()]
