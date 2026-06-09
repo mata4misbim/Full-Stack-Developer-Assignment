@@ -1,0 +1,6 @@
+from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
+from .models import User
+
+# ลงทะเบียนตาราง User ตัวคัสตอมให้ไปแสดงในหน้า Django Admin
+admin.site.register(User, UserAdmin)

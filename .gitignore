@@ -1,41 +1,23 @@
-# --- Python / Django ---
+# --- Python Virtual Environment ---
 backend/venv/
 backend/.venv/
-env/
 venv/
+env/
 
-
-*.pyc
+# --- Django Cache & Compiled Files ---
 __pycache__/
+*.pyc
 backend/**/__pycache__/
 
-
+# --- Local Database ---
 *.sqlite3
 backend/db.sqlite3
 
-
+# --- Media Uploads ---
 backend/media/
 media/
 
-
-# --- JavaScript / React / Node ---
-frontend/node_modules/
-node_modules/
-
-
-frontend/dist/
-frontend/build/
-out/
-
-
-# --- Environment Variables / Security ---
-.env
-.env.local
-*.env
-
-
-# --- Operating System / IDE ---
+# --- Operating System & Editor ---
 .DS_Store
 Thumbs.db
 .vscode/
-.idea/

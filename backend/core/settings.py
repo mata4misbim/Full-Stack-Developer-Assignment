@@ -31,13 +31,22 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
+   'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'users', 'products', 'cart', 'orders','rest_framework','corsheaders'
+    
+    # Third-party apps
+    'rest_framework',
+    'corsheaders',
+    
+    # โครงสร้างแอปพลิเคชันหลัก
+    'users',
+    'products',
+    'cart',
+    'orders',
 ]
 
 MIDDLEWARE = [
