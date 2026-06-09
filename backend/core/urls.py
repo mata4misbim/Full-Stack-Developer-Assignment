@@ -19,7 +19,12 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    
-    # 🔌 เชื่อมต่อระบบ Auth ของแอป users เข้าสู่ระบบหลัก
+    # เชื่อมต่อระบบ Auth ของแอป users เข้าสู่ระบบหลัก
     path('api/auth/', include('users.urls')),
+
+    #เชื่อมเส้นทางระบบจัดการสินค้าเข้ามาเพิ่ม
+    path('api/products/', include('products.urls')),
+
+    #เชื่อมเส้นทางระบบตะกร้าสินค้าเข้ามาเพิ่ม
+    path('api/cart/', include('cart.urls')),
 ]
