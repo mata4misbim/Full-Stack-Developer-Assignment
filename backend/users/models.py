@@ -1,6 +1,8 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+#AbstractUser Biul in model มี user,pass
+
 class User(AbstractUser):
     ROLE_CHOICES = (
         ('seller', 'Seller'),

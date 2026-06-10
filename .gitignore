@@ -2,7 +2,9 @@
 backend/venv/
 backend/.venv/
 venv/
-env/
+backend/.env/
+
+
 
 # --- Django Cache & Compiled Files ---
 __pycache__/
