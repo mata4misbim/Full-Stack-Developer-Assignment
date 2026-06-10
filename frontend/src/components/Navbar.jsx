@@ -60,19 +60,28 @@ function Navbar() {
             Logout
           </button>
         ) : (
-          <Link
-            to="/login"
-            style={{
-              backgroundColor: "#2ecc71",
-              color: "white",
-              padding: "8px 15px",
-              borderRadius: "4px",
-              textDecoration: "none",
-              fontWeight: "bold",
-            }}
-          >
-            Login
-          </Link>
+          <>
+            {/* เพิ่มลิงก์สมัครสมาชิกตรงนี้ */}
+            <Link
+              to="/register"
+              style={{ color: "white", textDecoration: "none" }}
+            >
+              สมัครสมาชิก
+            </Link>
+            <Link
+              to="/login"
+              style={{
+                backgroundColor: "#2ecc71",
+                color: "white",
+                padding: "8px 15px",
+                borderRadius: "4px",
+                textDecoration: "none",
+                fontWeight: "bold",
+              }}
+            >
+              Login
+            </Link>
+          </>
         )}
       </div>
     </nav>
