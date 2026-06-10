@@ -1,9 +1,7 @@
-// src/components/Navbar.jsx
-import React from "react";
 import { Link } from "react-router-dom";
 
 function Navbar() {
-  // ฟังก์ชันเช็คว่าล็อกอินหรือยัง (ดูว่ามี Token ไหม)
+  // เช็คโทเค่น
   const isLoggedIn = !!localStorage.getItem("access_token");
 
   const handleLogout = () => {
@@ -61,7 +59,6 @@ function Navbar() {
           </button>
         ) : (
           <>
-            {/* เพิ่มลิงก์สมัครสมาชิกตรงนี้ */}
             <Link
               to="/register"
               style={{ color: "white", textDecoration: "none" }}

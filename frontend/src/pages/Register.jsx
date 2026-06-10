@@ -1,5 +1,4 @@
-// src/pages/Register.jsx
-import React, { useState } from "react";
+import { useState } from "react";
 import { BASE_URL } from "../api";
 
 function Register() {
@@ -37,7 +36,7 @@ function Register() {
       const data = await response.json();
 
       if (!response.ok) {
-        // ถ้าแบคเอนด์ส่ง Error กลับมา (เช่น Username/Email ซ้ำ) ให้พ่นแจ้งเตือน
+        // รับ error จาก backend ละส่งออก
         throw new Error(
           getErrorMessage(data) || "สมัครสมาชิกไม่สำเร็จ กรุณาลองใหม่อีกครั้ง",
         );

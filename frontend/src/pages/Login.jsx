@@ -1,5 +1,4 @@
-// src/pages/Login.jsx
-import React, { useState } from "react";
+import { useState } from "react";
 import { BASE_URL } from "../api";
 
 function Login() {
@@ -7,7 +6,7 @@ function Login() {
   const [password, setPassword] = useState("");
 
   const handleLogin = async (e) => {
-    e.preventDefault(); // ป้องกันหน้าเว็บรีเฟรชตัวเองตอนกดส่งฟอร์ม
+    e.preventDefault(); // กันเว็บรี
 
     try {
       const response = await fetch(`${BASE_URL}/api/auth/login/`, {
@@ -24,12 +23,12 @@ function Login() {
 
       const data = await response.json();
 
-      // 🔑 ช็อตเด็ด: บันทึก Token ทั้งสองตัวลงความจำของเบราว์เซอร์
+      // save token to storage
       localStorage.setItem("access_token", data.access);
       localStorage.setItem("refresh_token", data.refresh);
 
       alert("🎉 เข้าสู่ระบบสำเร็จแล้วครับ!");
-      window.location.href = "/"; // ล็อกอินเสร็จส่งกลับไปหน้าแรกเพื่อช็อปปิ้ง
+      window.location.href = "/"; // กลับไปหน้าแรก
     } catch (error) {
       alert(error.message);
     }
