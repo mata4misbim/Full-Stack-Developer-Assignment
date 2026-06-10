@@ -5,7 +5,7 @@ from .models import User
 
 class UserAuthTests(APITestCase):
     def setUp(self):
-        # เปลี่ยนเป็นใช้การระบุ URL Path แบบตรงๆ แทนการ reverse เพื่อป้องกันปัญหา namespace
+        
         self.register_url = '/api/auth/register/'
 
     def test_register_buyer_success(self):
@@ -18,7 +18,7 @@ class UserAuthTests(APITestCase):
         }
         response = self.client.post(self.register_url, data, format='json')
         
-        # ถ้าระบบตอบกลับเป็น 404 ให้ลองส่งไปที่อีกโครงสร้างหนึ่งที่มีโอกาสเป็นไปได้คือ '/api/users/register/'
+        
         if response.status_code == 404:
             self.register_url = '/api/users/register/'
             response = self.client.post(self.register_url, data, format='json')
@@ -37,7 +37,7 @@ class UserAuthTests(APITestCase):
         }
         response = self.client.post(self.register_url, data, format='json')
         
-        # ถ้าระบบตอบกลับเป็น 404 ให้ลองส่งไปที่อีกโครงสร้างหนึ่งที่มีโอกาสเป็นไปได้คือ '/api/users/register/'
+        
         if response.status_code == 404:
             self.register_url = '/api/users/register/'
             response = self.client.post(self.register_url, data, format='json')
