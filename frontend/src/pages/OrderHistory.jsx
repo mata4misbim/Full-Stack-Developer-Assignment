@@ -5,30 +5,53 @@ function OrderHistory() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchOrders = async () => {
-    const token = localStorage.getItem("access_token");
-    if (!token) return;
+  //   const fetchOrders = async () => {
+  //     const token = localStorage.getItem("access_token");
+  //     if (!token) return;
 
-    try {
-      const response = await fetch(`${BASE_URL}/api/orders/`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+  //     try {
+  //       const response = await fetch(`${BASE_URL}/api/orders/`, {
+  //         method: "GET",
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       });
 
-      if (!response.ok) throw new Error("ดึงข้อมูลประวัติการสั่งซื้อไม่สำเร็จ");
-      const data = await response.json();
-      setOrders(data);
-    } catch (error) {
-      console.error("Error fetching orders:", error);
-    }
-    {
-      setLoading(false);
-    }
-  };
+  //       if (!response.ok) throw new Error("ดึงข้อมูลประวัติการสั่งซื้อไม่สำเร็จ");
+  //       const data = await response.json();
+  //       setOrders(data);
+  //     } catch (error) {
+  //       console.error("Error fetching orders:", error);
+  //     }
+  //     {
+  //       setLoading(false);
+  //     }
+  //   };
 
   useEffect(() => {
+    const fetchOrders = async () => {
+      const token = localStorage.getItem("access_token");
+      if (!token) return;
+
+      try {
+        const response = await fetch(`${BASE_URL}/api/orders/`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok)
+          throw new Error("ดึงข้อมูลประวัติการสั่งซื้อไม่สำเร็จ");
+        const data = await response.json();
+        setOrders(data);
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+      }
+      {
+        setLoading(false);
+      }
+    };
     fetchOrders();
   }, []);
 

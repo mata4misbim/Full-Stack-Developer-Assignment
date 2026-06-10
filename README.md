@@ -266,3 +266,229 @@ Potential improvements for production environments:
 - Unit & integration test coverage expansion
 
 ---
+
+# StoreFront Management System — Frontend
+
+Frontend application สำหรับระบบ Marketplace ระหว่าง Seller และ Buyer
+พัฒนาด้วย React และ Vite
+
+---
+
+# Tech Stack
+
+| Component         | Technology       |
+| ----------------- | ---------------- |
+| Framework         | React            |
+| Build Tool        | Vite             |
+| Language          | JavaScript       |
+| Routing           | React Router DOM |
+| API Communication | Fetch API        |
+| Styling           | CSS              |
+
+---
+
+# Features
+
+- User authentication (Register / Login)
+- JWT token handling
+- Product listing
+- Product detail page
+- Seller product management
+- Shopping cart
+- Checkout system
+- Order history
+- Product image upload
+
+---
+
+# Project Structure
+
+```bash id="ck1l6i"
+frontend/
+├── public/
+├── src/
+│
+│   ├── assets/                  # Static assets
+│
+│   ├── components/              # Reusable UI components
+│   │   ├── Navbar.jsx
+│   │   ├── ProductCard.jsx
+│   │   ├── ProductModal.jsx
+│   │   └── CartProductCard.jsx
+│   │
+│   ├── pages/                   # Application pages
+│   │   ├── Login.jsx
+│   │   ├── Register.jsx
+│   │   ├── ProductList.jsx
+│   │   ├── ProductDetail.jsx
+│   │   ├── ManageProducts.jsx
+│   │   ├── Cart.jsx
+│   │   └── OrderHistory.jsx
+│   │
+│   ├── api.js                   # Fetch API requests
+│   ├── App.jsx
+│   ├── main.jsx
+│   ├── App.css
+│   └── index.css
+│
+├── index.html
+├── package.json
+├── vite.config.js
+└── README.md
+```
+
+---
+
+# Installation & Setup
+
+## 1. Install Dependencies
+
+```bash id="1jlwm8"
+npm install
+```
+
+---
+
+## 2. Start Development Server
+
+```bash id="2jlwm8"
+npm run dev
+```
+
+Frontend will run at:
+
+```txt id="3jlwm8"
+http://localhost:5173
+```
+
+---
+
+# Build for Production
+
+```bash id="4jlwm8"
+npm run build
+```
+
+---
+
+# Environment Variables
+
+Create `.env` file in the project root:
+
+```env id="5jlwm8"
+VITE_API_URL=http://localhost:8000/api
+```
+
+---
+
+# Backend Connection
+
+This frontend connects to the Django REST API backend.
+
+Default backend URL:
+
+```txt id="6jlwm8"
+http://localhost:8000/api
+```
+
+---
+
+# Authentication
+
+JWT access tokens are stored on the client side and attached to protected API requests.
+
+Example Authorization header:
+
+```http id="7jlwm8"
+Authorization: Bearer <access_token>
+```
+
+---
+
+# API Communication
+
+The project uses the native Fetch API for backend communication.
+
+Example request:
+
+```javascript id="8jlwm8"
+const response = await fetch("http://localhost:8000/api/products/");
+
+const data = await response.json();
+```
+
+---
+
+# Core Pages
+
+| Page           | Description                    |
+| -------------- | ------------------------------ |
+| Login          | User authentication            |
+| Register       | Create buyer or seller account |
+| ProductList    | Display all products           |
+| ProductDetail  | Show product information       |
+| ManageProducts | Seller product management      |
+| Cart           | Shopping cart                  |
+| OrderHistory   | User order history             |
+
+---
+
+# Architectural Decisions
+
+## React + Vite
+
+Chosen because:
+
+- Fast development experience
+- Lightweight tooling
+- Simple configuration
+- Fast hot reload
+
+---
+
+## Component-Based Structure
+
+UI is separated into reusable components to improve:
+
+- maintainability
+- scalability
+- readability
+
+---
+
+## Fetch API
+
+Used because:
+
+- Built directly into the browser
+- Lightweight
+- No additional dependency required
+
+---
+
+# Core Features
+
+- JWT Authentication
+- Seller / Buyer role system
+- Product CRUD
+- Product image upload
+- Shopping cart
+- Checkout system
+- Order history
+- Inventory stock updates
+
+---
+
+# Future Improvements
+
+Potential improvements for production environments:
+
+- Global state management
+- Pagination
+- Product filtering & search
+- Responsive mobile optimization
+- Better error handling
+- Loading states / skeleton UI
+- Unit testing
+
+---
