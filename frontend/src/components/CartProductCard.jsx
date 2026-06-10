@@ -13,59 +13,67 @@ function CartProductCard({ item, onUpdateQuantity, onRemoveItem }) {
   const image = details.image || item.product_image;
 
   return (
-    <div className="flex flex-col sm:flex-row gap-4 bg-white rounded-xl p-4 border border-gray-100 shadow-sm items-center justify-between">
-      <div className="flex items-center gap-4 w-full sm:w-auto">
-        {/* รูปภาพสินค้าจากตู้น้องหมาสุดน่ารัก */}
-        <div className="w-20 h-20 bg-gray-50 rounded-lg overflow-hidden shrink-0 flex items-center justify-center border border-gray-100">
-          {image ? (
-            <img
-              src={getImageUrl(image)}
-              alt={title}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <span className="text-xs text-gray-400">ไม่มีรูป</span>
-          )}
-        </div>
-
-        {/* รายละเอียด ชื่อ และราคารายชิ้น */}
-        <div>
-          <h3 className="font-bold text-gray-900 line-clamp-1">{title}</h3>
-          <p className="text-sm text-emerald-600 font-semibold mt-0.5">
-            ฿{price.toLocaleString()}
-          </p>
-        </div>
+    <div className="flex items-center gap-5 bg-white rounded-2xl p-4 border border-slate-100 shadow-sm hover:border-emerald-100 transition-all">
+      <div className="w-20 h-20 bg-slate-50 rounded-xl overflow-hidden shrink-0 border border-slate-100">
+        {image ? (
+          <img
+            src={getImageUrl(image)}
+            alt={title}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-[10px] text-slate-400 uppercase font-bold">
+            No Image
+          </div>
+        )}
       </div>
 
-      {/* โซนจัดการจำนวนชิ้น และปุ่มลบถังขยะ */}
-      <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto border-t sm:border-t-0 pt-3 sm:pt-0">
-        {/* 🛠️ ปุ่มปรับเพิ่ม/ลดจำนวนสินค้า */}
-        <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-gray-50">
+      <div className="flex-1 min-w-0">
+        <h3 className="font-bold text-slate-900 truncate">{title}</h3>
+        <p className="text-sm font-semibold text-emerald-600 mt-1">
+          ฿{price.toLocaleString()}
+        </p>
+      </div>
+
+      <div className="flex items-center gap-4">
+        <div className="flex items-center bg-slate-50 rounded-xl p-1 border border-slate-100">
           <button
             onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
             disabled={item.quantity <= 1}
-            className="px-3 py-1 text-gray-600 hover:bg-gray-200 transition-colors disabled:opacity-40 disabled:hover:bg-transparent font-bold"
+            className="w-8 h-8 flex items-center justify-center text-slate-500 hover:bg-white hover:text-emerald-600 rounded-lg transition-all disabled:opacity-30 font-bold"
           >
             -
           </button>
-          <span className="px-4 py-1 text-sm font-semibold text-gray-900 bg-white min-w-10 text-center">
+          <span className="w-10 text-center text-sm font-bold text-slate-900">
             {item.quantity}
           </span>
           <button
             onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
-            className="px-3 py-1 text-gray-600 hover:bg-gray-200 transition-colors font-bold"
+            className="w-8 h-8 flex items-center justify-center text-slate-500 hover:bg-white hover:text-emerald-600 rounded-lg transition-all font-bold"
           >
             +
           </button>
         </div>
 
-        {/* ถังขยะลบไอเทมนี้ออกจากตะกร้า */}
+        {/* ปุ่มลบ*/}
         <button
           onClick={() => onRemoveItem(item.id)}
-          className="text-gray-400 hover:text-red-500 p-2 rounded-lg hover:bg-red-50 transition-colors"
+          className="text-slate-300 hover:text-rose-500 p-2 rounded-lg hover:bg-rose-50 transition-colors"
           title="ลบสินค้า"
         >
-          🗑️
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+            ></path>
+          </svg>
         </button>
       </div>
     </div>

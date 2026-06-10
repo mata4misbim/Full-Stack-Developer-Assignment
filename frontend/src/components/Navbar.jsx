@@ -1,96 +1,91 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function Navbar() {
-  // เช็คโทเค่น
+  const navigate = useNavigate();
+  // เช็คโทเค่นสำหรับเช็คสถานะการเข้าสู่ระบบ
   const isLoggedIn = !!localStorage.getItem("access_token");
 
   const handleLogout = () => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
     localStorage.removeItem("username");
-    alert("ออกจากระบบเรียบร้อยครับ!");
-    window.location.href = "/login"; // เด้งไปหน้า login
+    alert("ออกจากระบบเรียบร้อย!");
+
+    // เปลี่ยนมาใช้ดีไซน์ฝั่ง React Router แทนการยิง window.location เพื่อความลื่นไหล
+    navigate("/login");
   };
 
   return (
-    <nav
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        padding: "15px 30px",
-        backgroundColor: "#2c3e50",
-        color: "white",
-        fontFamily: "sans-serif",
-      }}
-    >
-      <Link
-        to="/"
-        style={{
-          color: "white",
-          textDecoration: "none",
-          fontSize: "20px",
-          fontWeight: "bold",
-        }}
-      >
-        StoreFront
-      </Link>
-
-      <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
-        <Link to="/" style={{ color: "white", textDecoration: "none" }}>
-          หน้าแรก
+    <nav className="bg-slate-900 border-b border-slate-800 text-slate-100 font-sans tracking-wide sticky top-0 z-50">
+      <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+        {/* โลโก้ */}
+        <Link
+          to="/"
+          className="text-xl font-black tracking-tighter bg-gradient-to-r from-emerald-400 to-teal-500 bg-clip-text text-transparent hover:opacity-90 transition-opacity"
+        >
+          StoreFront
         </Link>
-        <Link to="/cart" style={{ color: "white", textDecoration: "none" }}>
-          🛒 ตะกร้า
-        </Link>
-        {isLoggedIn && (
-          <Link to="/orders" className="text-white no-underline">
-            📜 ประวัติการสั่งซื้อ
-          </Link>
-        )}
-        {isLoggedIn && (
-          <Link to="/seller/manage" className="text-white no-underline">
-            🏬 จัดการหน้าร้านค้า
-          </Link>
-        )}
 
-        {isLoggedIn ? (
-          <button
-            onClick={handleLogout}
-            style={{
-              backgroundColor: "#e74c3c",
-              color: "white",
-              border: "none",
-              padding: "8px 15px",
-              borderRadius: "4px",
-              cursor: "pointer",
-            }}
+        {/* เมนู */}
+        <div className="flex items-center gap-6 text-sm font-medium">
+          <Link
+            to="/"
+            className="text-slate-300 hover:text-emerald-400 transition-colors duration-200"
           >
-            Logout
-          </button>
-        ) : (
-          <>
-            <Link
-              to="/register"
-              style={{ color: "white", textDecoration: "none" }}
+            หน้าแรก
+          </Link>
+
+          <Link
+            to="/cart"
+            className="text-slate-300 hover:text-emerald-400 transition-colors duration-200 flex items-center gap-1.5"
+          >
+            <span className="hidden sm:inline">ตะกร้า</span>
+          </Link>
+
+          {/* เมนูสำหรับคนที่ล็อคอินแล้ว */}
+          {isLoggedIn && (
+            <>
+              <Link
+                to="/orders"
+                className="text-slate-300 hover:text-emerald-400 transition-colors duration-200 flex items-center gap-1.5"
+              >
+                <span className="hidden sm:inline">ประวัติสั่งซื้อ</span>
+              </Link>
+              <Link
+                to="/seller/manage"
+                className="text-slate-300 hover:text-emerald-400 transition-colors duration-200 flex items-center gap-1.5"
+              >
+                <span className="hidden sm:inline">จัดการหน้าร้าน</span>
+              </Link>
+            </>
+          )}
+
+          <span className="h-4 w-[1px] bg-slate-800 hidden sm:block"></span>
+
+          {isLoggedIn ? (
+            <button
+              onClick={handleLogout}
+              className="bg-rose-950/40 hover:bg-rose-900 text-rose-400 border border-rose-900/50 hover:border-rose-700 px-4 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer"
             >
-              สมัครสมาชิก
-            </Link>
-            <Link
-              to="/login"
-              style={{
-                backgroundColor: "#2ecc71",
-                color: "white",
-                padding: "8px 15px",
-                borderRadius: "4px",
-                textDecoration: "none",
-                fontWeight: "bold",
-              }}
-            >
-              Login
-            </Link>
-          </>
-        )}
+              Logout
+            </button>
+          ) : (
+            <div className="flex items-center gap-3">
+              <Link
+                to="/register"
+                className="text-slate-400 hover:text-slate-200 transition-colors duration-200 text-xs"
+              >
+                สมัครสมาชิก
+              </Link>
+              <Link
+                to="/login"
+                className="bg-emerald-600 hover:bg-emerald-500 text-slate-900 font-bold px-4 py-1.5 rounded-xl text-xs shadow-md shadow-emerald-900/20 transition-all duration-200"
+              >
+                Login
+              </Link>
+            </div>
+          )}
+        </div>
       </div>
     </nav>
   );

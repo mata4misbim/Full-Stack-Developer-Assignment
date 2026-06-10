@@ -1,6 +1,3 @@
-// src/components/ProductModal.jsx
-import React from "react";
-
 function ProductModal({
   isOpen,
   editMode,
@@ -11,144 +8,141 @@ function ProductModal({
   price,
   setPrice,
   quantity,
-  setQuantity, // 💡 รับ Props จำนวนสต็อกสินค้าเข้ามาใช้งาน
+  setQuantity,
   description,
   setDescription,
   setImage,
   saveLoading,
 }) {
-  // ถ้าไม่ได้สั่งเปิดหน้าต่างป๊อปอัป ให้ส่งกลับเป็น null (ซ่อนไว้)
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-2xl w-full max-w-md p-6 border border-gray-100 shadow-2xl relative mx-4 animate-fadeIn">
-        {/* ปุ่มกากบาทปิดหน้าต่างมุมขวาบน */}
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+      <div className="bg-white rounded-3xl w-full max-w-md p-8 border border-slate-100 shadow-2xl relative animate-in fade-in zoom-in duration-200">
+        {/* ปุ่มปิด */}
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 font-bold text-lg transition-colors"
+          className="absolute top-6 right-6 text-slate-400 hover:text-slate-900 transition-colors"
         >
-          ✕
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M6 18L18 6M6 6l12 12"
+            ></path>
+          </svg>
         </button>
 
-        {/* หัวข้อแสดงผลตามโหมดการทำงาน */}
-        <div className="mb-4">
-          <h2 className="text-xl font-black text-gray-900">
-            {editMode ? "✏️ แก้ไขข้อมูลสินค้า" : "➕ ลงขายสินค้าใหม่"}
+        {/* Header */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-black text-slate-900 tracking-tight">
+            {editMode ? "แก้ไขสินค้า" : "ลงขายสินค้าใหม่"}
           </h2>
-          <p className="text-xs text-gray-400 mt-0.5">
+          <p className="text-sm text-slate-500 mt-1">
             {editMode
-              ? "แก้ไขรายละเอียดสินค้าของท่านแล้วกดบันทึก"
-              : "กรอกข้อมูลให้ครบถ้วนเพื่ออัปเดตเข้าสู่หน้าร้านค้ารวม"}
+              ? "ปรับปรุงข้อมูลให้เป็นปัจจุบัน"
+              : "กรอกข้อมูลเพื่อนำสินค้าขึ้นหน้าร้าน"}
           </p>
         </div>
 
-        {/* ฟอร์มรับส่งข้อมูล */}
-        <form onSubmit={onSubmit} className="space-y-4">
-          {/* 1. ช่องกรอกชื่อสินค้า */}
-          <div>
-            <label className="block text-xs font-bold text-gray-700 mb-1">
-              ชื่อสินค้า *
-            </label>
-            <input
-              type="text"
-              required
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="ชื่อของสินค้าชิ้นนี้"
-              className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500 text-sm text-gray-900"
-            />
-          </div>
+        {/* ฟอร์ม */}
+        <form onSubmit={onSubmit} className="space-y-5">
+          {[
+            {
+              label: "ชื่อสินค้า",
+              value: title,
+              setter: setTitle,
+              type: "text",
+              placeholder: "เช่น เสื้อยืดมินิมอล",
+            },
+            {
+              label: "ราคา (บาท)",
+              value: price,
+              setter: setPrice,
+              type: "number",
+              placeholder: "0.00",
+            },
+            {
+              label: "จำนวนในสต็อก",
+              value: quantity,
+              setter: setQuantity,
+              type: "number",
+              placeholder: "0",
+            },
+          ].map((field, idx) => (
+            <div key={idx}>
+              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 ml-1">
+                {field.label}
+              </label>
+              <input
+                type={field.type}
+                required
+                value={field.value}
+                onChange={(e) => field.setter(e.target.value)}
+                placeholder={field.placeholder}
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-sm font-medium"
+              />
+            </div>
+          ))}
 
-          {/* 2. ช่องกรอกราคาสินค้า */}
+          {/* Textarea */}
           <div>
-            <label className="block text-xs font-bold text-gray-700 mb-1">
-              ราคาสินค้า (บาท) *
-            </label>
-            <input
-              type="number"
-              required
-              min="0"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              placeholder="0.00"
-              className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500 text-sm text-gray-900"
-            />
-          </div>
-
-          {/* 3. 🎯 ช่องกรอกจำนวนสินค้าในสต็อก (สกัดจุดบั๊ก quantity: Required) */}
-          <div>
-            <label className="block text-xs font-bold text-gray-700 mb-1">
-              จำนวนสินค้าในสต็อก (ชิ้น) *
-            </label>
-            <input
-              type="number"
-              required
-              min="1"
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
-              placeholder="ใส่จำนวนสินค้า เช่น 10"
-              className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500 text-sm text-gray-900"
-            />
-          </div>
-
-          {/* 4. ช่องกรอกรายละเอียดสินค้า */}
-          <div>
-            <label className="block text-xs font-bold text-gray-700 mb-1">
+            <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 ml-1">
               รายละเอียด
             </label>
             <textarea
               rows="3"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="คำอธิบายข้อมูลของสินค้าชิ้นนี้..."
-              className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500 text-sm resize-none text-gray-900"
+              placeholder="บอกรายละเอียดเพิ่มเติมให้ลูกค้าตัดสินใจง่ายขึ้น..."
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-sm font-medium resize-none"
             />
           </div>
 
-          {/* 5. ช่องอัปโหลดไฟล์รูปภาพ */}
+          {/* File Upload */}
           <div>
-            <label className="block text-xs font-bold text-gray-700 mb-1">
-              รูปภาพสินค้า{" "}
-              {editMode && (
-                <span className="text-amber-600 font-normal">
-                  (ปล่อยว่างไว้ได้ถ้าใช้รูปเดิม)
-                </span>
-              )}
+            <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 ml-1">
+              รูปภาพสินค้า
             </label>
             <input
               type="file"
               accept="image/*"
               onChange={(e) => e.target.files && setImage(e.target.files[0])}
-              className="w-full text-xs text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer"
+              className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200 transition-colors cursor-pointer"
             />
           </div>
 
-          {/* กลุ่มปุ่มควบคุม (ยกเลิก / ยืนยัน) */}
-          <div className="flex gap-3 pt-2">
+          {/* Buttons */}
+          <div className="flex gap-3 pt-4">
             <button
               type="button"
               onClick={onClose}
               disabled={saveLoading}
-              className="w-1/2 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold py-2.5 rounded-xl transition-colors text-sm disabled:opacity-50"
+              className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3.5 rounded-2xl transition-all text-sm"
             >
               ยกเลิก
             </button>
             <button
               type="submit"
               disabled={saveLoading}
-              className={`w-1/2 text-white font-bold py-2.5 rounded-xl shadow transition-colors text-sm disabled:opacity-50 ${
+              className={`flex-1 text-white font-bold py-3.5 rounded-2xl shadow-lg transition-all text-sm ${
                 editMode
-                  ? "bg-amber-600 hover:bg-amber-700"
-                  : "bg-emerald-600 hover:bg-emerald-700"
+                  ? "bg-amber-500 hover:bg-amber-600 shadow-amber-500/20"
+                  : "bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/20"
               }`}
             >
               {saveLoading
                 ? "กำลังบันทึก..."
                 : editMode
-                  ? "💾 บันทึกการแก้ไข"
-                  : "🚀 ลงขายสินค้า"}
+                  ? "บันทึกการแก้ไข"
+                  : "ลงขายสินค้า"}
             </button>
           </div>
         </form>

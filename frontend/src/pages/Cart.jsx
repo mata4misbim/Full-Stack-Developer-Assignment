@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { BASE_URL } from "../api";
-import CartProductCard from "../components/CartProductCard"; // 🎯 เรียกใช้การ์ดย่อยที่แยกออกมา
+import CartProductCard from "../components/CartProductCard";
 
 function Cart() {
   const [cartItems, setCartItems] = useState([]);
@@ -33,35 +33,33 @@ function Cart() {
     fetchCartItems();
   }, []);
 
-  // 🛠️ ฟังก์ชันสำหรับอัปเดตจำนวนชิ้นสินค้า (+/-) ยิงไปที่หลังบ้าน
+  // ฟังก์ชันสำหรับอัปเดตจำนวนชิ้นสินค้า
   const handleUpdateQuantity = async (cartItemId, newQuantity) => {
     if (newQuantity < 1) return;
     const token = localStorage.getItem("access_token");
 
-    // หาข้อมูลไอเทมชิ้นนี้ใน State หน้าบ้านก่อนเพื่อเอา product_id จริงไปยิงส่ง
     const targetItem = cartItems.find((item) => item.id === cartItemId);
     if (!targetItem) return;
 
-    // ดึง product_id ออกมาจากโครงสร้าง (อาจเป็น targetItem.product หรือ targetItem.product_details.id)
+    // ดึง product_id
     const productId = targetItem.product || targetItem.product_details?.id;
 
     try {
       const response = await fetch(`${BASE_URL}/api/cart/`, {
-        method: "POST", // เปลี่ยนมาใช้ POST แทน PATCH ที่โดนด่า 405
+        method: "POST", // อัพเดททุกฟิล
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           product_id: productId,
-          quantity: 1, // หรือส่งค่าผลต่างไปให้หลังบ้านคำนวณบวกเพิ่ม
+          quantity: 1,
         }),
       });
 
       if (!response.ok)
         throw new Error("หลังบ้านไม่อนุญาตให้แก้ไขจำนวนด้วยวิธีนี้");
 
-      // ถ้าผ่าน ให้รีเฟรชหรืออัปเดตสถานะหน้าบ้านตามความเหมาะสม
       setCartItems(
         cartItems.map((item) =>
           item.id === cartItemId ? { ...item, quantity: newQuantity } : item,
@@ -99,7 +97,7 @@ function Cart() {
         },
       });
       if (!response.ok) throw new Error("การสั่งซื้อสินค้าล้มเหลว");
-      alert("🚀 สั่งซื้อสินค้าสำเร็จเรียบร้อยครับ!");
+      alert("สั่งซื้อสินค้าสำเร็จเรียบร้อยครับ!");
       setCartItems([]);
     } catch (error) {
       alert(error.message);
@@ -121,7 +119,7 @@ function Cart() {
     return (
       <div className="max-w-md mx-auto my-16 p-8 text-center bg-white rounded-2xl shadow border border-gray-100">
         <h2 className="text-2xl font-bold text-gray-900 mb-3">
-          🔒 ยังไม่ได้เข้าสู่ระบบ
+          ยังไม่ได้เข้าสู่ระบบ
         </h2>
         <Link
           to="/login"
@@ -136,65 +134,86 @@ function Cart() {
   if (loading)
     return (
       <h2 className="text-center text-xl font-bold mt-12 text-gray-700">
-        🛒 กำลังเปิดดูตะกร้าสินค้า...
+        กำลังเปิดดูตะกร้าสินค้า...
       </h2>
     );
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-10">
-      <h1 className="text-3xl font-extrabold text-gray-900 mb-8">
-        🛒 ตะกร้าสินค้าของคุณ ({cartItems.length} รายการ)
-      </h1>
+    <div className="max-w-5xl mx-auto px-4 py-12">
+      {/* Header สไตล์สะอาดตา */}
+      <div className="mb-10">
+        <h1 className="text-3xl font-black text-slate-900 tracking-tight">
+          ตะกร้าสินค้าของคุณ
+        </h1>
+        <p className="text-slate-500 mt-2 font-medium">
+          {cartItems.length} รายการที่กำลังรอการชำระเงิน
+        </p>
+      </div>
 
       {cartItems.length === 0 ? (
-        <div className="bg-white rounded-2xl p-12 text-center border border-gray-100 shadow-sm">
-          <p className="text-gray-400 text-lg mb-6">
+        <div className="bg-white rounded-3xl p-16 text-center border border-slate-100 shadow-sm">
+          <div className="text-5xl mb-4">🛒</div>
+          <p className="text-slate-400 text-lg mb-6">
             ไม่มีสินค้าอยู่ในตะกร้าในขณะนี้
           </p>
           <Link
             to="/"
-            className="inline-block bg-indigo-600 text-white font-semibold px-6 py-3 rounded-xl hover:bg-indigo-700"
+            className="inline-block bg-slate-900 text-white font-bold px-8 py-3 rounded-2xl hover:bg-slate-800 transition-all shadow-lg"
           >
-            🛍️ ไปเลือกซื้อสินค้า
+            เลือกซื้อสินค้าเพิ่ม
           </Link>
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* ฝั่งซ้าย: วนลูปเรียกใช้ Component การ์ดแยกชิ้นที่เราเพิ่งสร้าง */}
+          {/* ลูปการ์ดสินค้า */}
           <div className="lg:col-span-2 space-y-4">
             {cartItems.map((item) => (
-              <CartProductCard
+              <div
                 key={item.id}
-                item={item}
-                onUpdateQuantity={handleUpdateQuantity}
-                onRemoveItem={handleRemoveItem}
-              />
+                className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm"
+              >
+                <CartProductCard
+                  item={item}
+                  onUpdateQuantity={handleUpdateQuantity}
+                  onRemoveItem={handleRemoveItem}
+                />
+              </div>
             ))}
           </div>
 
-          {/* ฝั่งขวา: สรุปบิลยอดรวมชำระเงิน */}
-          <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm h-fit space-y-6">
-            <h2 className="text-xl font-bold text-gray-900 border-b pb-3">
+          {/* สรุปบิลยอดรวม */}
+          <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm h-fit space-y-6 self-start sticky top-24">
+            <h2 className="text-lg font-black text-slate-900 border-b border-slate-100 pb-4">
               สรุปคำสั่งซื้อ
             </h2>
-            <div className="flex justify-between items-center">
-              <span className="text-gray-500">ราคารวมสินค้า</span>
-              <span className="text-lg font-bold text-gray-900">
-                ฿{calculateTotal().toLocaleString()}
-              </span>
+
+            <div className="space-y-3">
+              <div className="flex justify-between text-slate-500">
+                <span>ราคารวมสินค้า</span>
+                <span className="font-semibold text-slate-900">
+                  ฿{calculateTotal().toLocaleString()}
+                </span>
+              </div>
+              <div className="flex justify-between items-center pt-4 border-t border-slate-100">
+                <span className="font-bold text-slate-900">
+                  ยอดชำระทั้งสิ้น
+                </span>
+                <span className="text-2xl font-black text-emerald-600">
+                  ฿{calculateTotal().toLocaleString()}
+                </span>
+              </div>
             </div>
-            <div className="border-t pt-4 flex justify-between items-center">
-              <span className="font-bold text-gray-900">ยอดชำระทั้งสิ้น</span>
-              <span className="text-2xl font-black text-indigo-600">
-                ฿{calculateTotal().toLocaleString()}
-              </span>
-            </div>
+
             <button
               onClick={handleCheckout}
-              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition-all duration-100 text-center block"
+              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-4 rounded-2xl shadow-lg shadow-emerald-600/20 transition-all hover:-translate-y-0.5 active:scale-95"
             >
-              💳 ชำระเงินและสั่งซื้อ
+              ดำเนินการชำระเงิน
             </button>
+
+            <p className="text-[10px] text-center text-slate-400">
+              * ข้อมูลการสั่งซื้อจะถูกบันทึกและตัดสต็อกสินค้าทันที
+            </p>
           </div>
         </div>
       )}
