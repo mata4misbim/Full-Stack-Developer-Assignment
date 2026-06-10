@@ -1,3 +1,11 @@
+import { BASE_URL } from "../api";
+
+const getImageUrl = (image) => {
+  if (!image) return "";
+  if (image.startsWith("http://") || image.startsWith("https://")) return image;
+  return `${BASE_URL}${image.startsWith("/") ? "" : "/"}${image}`;
+};
+
 function CartProductCard({ item, onUpdateQuantity, onRemoveItem }) {
   const details = item.product_details || {};
   const title = details.title || "สินค้าไม่ระบุชื่อ";
@@ -8,10 +16,10 @@ function CartProductCard({ item, onUpdateQuantity, onRemoveItem }) {
     <div className="flex flex-col sm:flex-row gap-4 bg-white rounded-xl p-4 border border-gray-100 shadow-sm items-center justify-between">
       <div className="flex items-center gap-4 w-full sm:w-auto">
         {/* รูปภาพสินค้าจากตู้น้องหมาสุดน่ารัก */}
-        <div className="w-20 h-20 bg-gray-50 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center border border-gray-100">
+        <div className="w-20 h-20 bg-gray-50 rounded-lg overflow-hidden shrink-0 flex items-center justify-center border border-gray-100">
           {image ? (
             <img
-              src={image}
+              src={getImageUrl(image)}
               alt={title}
               className="w-full h-full object-cover"
             />
@@ -40,7 +48,7 @@ function CartProductCard({ item, onUpdateQuantity, onRemoveItem }) {
           >
             -
           </button>
-          <span className="px-4 py-1 text-sm font-semibold text-gray-900 bg-white min-w-[40px] text-center">
+          <span className="px-4 py-1 text-sm font-semibold text-gray-900 bg-white min-w-10 text-center">
             {item.quantity}
           </span>
           <button

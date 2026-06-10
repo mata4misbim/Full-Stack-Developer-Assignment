@@ -7,6 +7,7 @@ function Navbar() {
   const handleLogout = () => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
+    localStorage.removeItem("username");
     alert("ออกจากระบบเรียบร้อยครับ!");
     window.location.href = "/login"; // เด้งไปหน้า login
   };
@@ -45,6 +46,11 @@ function Navbar() {
         {isLoggedIn && (
           <Link to="/orders" className="text-white no-underline">
             📜 ประวัติการสั่งซื้อ
+          </Link>
+        )}
+        {isLoggedIn && (
+          <Link to="/seller/manage" className="text-white no-underline">
+            🏬 จัดการหน้าร้านค้า
           </Link>
         )}
 

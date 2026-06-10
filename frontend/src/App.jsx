@@ -6,6 +6,7 @@ import Register from "./pages/Register";
 import Cart from "./pages/Cart";
 import ProductDetail from "./pages/ProductDetail";
 import OrderHistory from "./pages/OrderHistory";
+import ManageProducts from "./pages/ManageProducts";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         {/*เพิ่มเส้นทางแบบ Dynamic Param ด้วย :id */}
         <Route path="/products/:id" element={<ProductDetail />} />
         <Route path="/orders" element={<OrderHistory />} />
+        <Route path="/seller/manage" element={<ManageProducts />} />
       </Routes>
     </Router>
   );

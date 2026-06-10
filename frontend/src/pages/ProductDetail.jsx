@@ -1,23 +1,20 @@
-import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+// src/pages/ProductDetail.jsx (ตัวอย่างการปรับปรุง)
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { BASE_URL } from "../api";
 
-const getImageUrl = (image) => {
-  if (!image) return "";
-  if (image.startsWith("http://") || image.startsWith("https://")) return image;
-  return `${BASE_URL}${image.startsWith("/") ? "" : "/"}${image}`;
-};
-
 function ProductDetail() {
-  const { id } = useParams(); // ดึง ID ออกมาจาก URL พาท
+  const { id } = useParams();
+  const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isAdding, setIsAdding] = useState(false);
 
   useEffect(() => {
-    const fetchProductDetail = async () => {
+    const fetchProduct = async () => {
       try {
         const response = await fetch(`${BASE_URL}/api/products/${id}/`);
-        if (!response.ok) throw new Error("ไม่พบสินค้ารายการนี้");
+        if (!response.ok) throw new Error("ไม่พบข้อมูลสินค้านี้");
         const data = await response.json();
         setProduct(data);
       } catch (error) {
@@ -26,18 +23,25 @@ function ProductDetail() {
         setLoading(false);
       }
     };
-    fetchProductDetail();
+    fetchProduct();
   }, [id]);
 
   const handleAddToCart = async () => {
+    // 💡 ดักจับความปลอดภัยหน้าบ้านอีกชั้น: ถ้าของหมดคลัง ไม่ให้ทำลอจิกแอดของ
+    if (product?.quantity === 0) {
+      alert("⚠️ สินค้าชิ้นนี้หมดสต็อกแล้วครับ ไม่สามารถเพิ่มลงตะกร้าได้");
+      return;
+    }
+
     const token = localStorage.getItem("access_token");
     if (!token) {
-      alert("❌ กรุณาเข้าสู่ระบบก่อนครับ!");
-      window.location.href = "/login";
+      alert("🔒 กรุณาเข้าสู่ระบบก่อนเลือกซื้อสินค้าครับ");
+      navigate("/login");
       return;
     }
 
     try {
+      setIsAdding(true);
       const response = await fetch(`${BASE_URL}/api/cart/`, {
         method: "POST",
         headers: {
@@ -46,91 +50,90 @@ function ProductDetail() {
         },
         body: JSON.stringify({ product_id: product.id, quantity: 1 }),
       });
-      if (!response.ok) {
-        let errMsg = "เพิ่มลงตะกร้าล้มเหลว";
-        try {
-          const data = await response.json();
-          errMsg =
-            data.detail || data.error || data.message || JSON.stringify(data);
-        } catch {
-          try {
-            errMsg = await response.text();
-          } catch {
-            /* ignore */
-          }
-        }
-        if (response.status === 401) {
-          alert("เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่");
-          window.location.href = "/login";
-          return;
-        }
-        throw new Error(errMsg);
-      }
-      alert("✨ เพิ่มสินค้าลงตะกร้าเรียบร้อย!");
+
+      if (!response.ok) throw new Error("เพิ่มเข้าตะกร้าไม่สำเร็จ");
+      alert("🛒 เพิ่มสินค้าลงตะกร้าเรียบร้อยแล้ว!");
     } catch (error) {
       alert(error.message);
+    } finally {
+      setIsAdding(false);
     }
   };
 
   if (loading)
-    return (
-      <h2 className="text-center text-xl font-bold mt-12 text-gray-700">
-        🔍 กำลังเปิดดูรายละเอียดสินค้า...
-      </h2>
-    );
+    return <h2 className="text-center mt-10">กำลังโหลดรายละเอียดสินค้า...</h2>;
   if (!product)
     return (
-      <h2 className="text-center text-xl text-red-500 mt-12">
-        ❌ ไม่พบสินค้าที่คุณต้องการ
-      </h2>
+      <h2 className="text-center mt-10 text-red-500">ไม่พบสินค้านี้ในระบบ</h2>
     );
 
-  return (
-    <div className="max-w-4xl mx-auto px-4 py-12">
-      <Link
-        to="/"
-        className="text-indigo-600 hover:text-indigo-800 font-semibold mb-6 inline-block"
-      >
-        ⬅️ กลับหน้าร้านค้า
-      </Link>
+  // 💡 เช็คว่าสินค้าหมดคลังหรือไม่
+  const isOutOfStock = product.quantity === 0 || product.quantity === undefined;
 
-      <div className="bg-white rounded-2xl shadow-md overflow-hidden grid grid-cols-1 md:grid-cols-2 gap-8 p-6 border border-gray-100">
+  return (
+    <div className="max-w-4xl mx-auto px-4 py-10">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
         {/* ฝั่งรูปภาพ */}
-        <div className="w-full h-80 md:h-96 bg-gray-50 rounded-xl overflow-hidden flex items-center justify-center">
+        <div className="aspect-square bg-gray-50 rounded-xl overflow-hidden border border-gray-100">
           {product.image ? (
             <img
-              src={getImageUrl(product.image)}
+              src={product.image}
               alt={product.title}
               className="w-full h-full object-cover"
             />
           ) : (
-            <span className="text-gray-400">ไม่มีรูปภาพสินค้า</span>
+            <div className="w-full h-full flex items-center justify-center text-gray-400">
+              ไม่มีรูปภาพ
+            </div>
           )}
         </div>
 
-        {/* ฝั่งข้อมูล */}
-        <div className="flex flex-col justify-between py-2">
+        {/* ฝั่งข้อมูลรายละเอียด */}
+        <div className="flex flex-col justify-between">
           <div>
-            <span className="bg-indigo-50 text-indigo-700 text-xs px-2.5 py-1 rounded-full font-medium">
-              ผู้ขาย: {product.seller_username}
-            </span>
-            <h1 className="text-3xl font-extrabold text-gray-900 mt-3 mb-4">
+            <h1 className="text-2xl font-black text-gray-900 mb-2">
               {product.title}
             </h1>
-            <p className="text-gray-600 leading-relaxed mb-6 whitespace-pre-line">
-              {product.description}
+            <p className="text-2xl font-bold text-emerald-600 mb-4">
+              ฿{parseFloat(product.price).toLocaleString()}
+            </p>
+
+            {/* 🎯 จุดที่ 1: แสดงจำนวนสต็อกคงเหลือ */}
+            <div className="mb-4">
+              {isOutOfStock ? (
+                <span className="inline-block bg-red-50 text-red-600 text-xs font-bold px-3 py-1.5 rounded-lg border border-red-100">
+                  🚫 สินค้าหมดชั่วคราว
+                </span>
+              ) : (
+                <span className="inline-block bg-emerald-50 text-emerald-700 text-xs font-bold px-3 py-1.5 rounded-lg border border-emerald-100">
+                  📦 คงเหลือในคลัง: {product.quantity} ชิ้น
+                </span>
+              )}
+            </div>
+
+            <hr className="border-gray-100 mb-4" />
+            <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">
+              {product.description ||
+                "ไม่มีคำอธิบายรายละเอียดสำหรับสินค้าชิ้นนี้"}
             </p>
           </div>
 
-          <div>
-            <div className="text-3xl font-black text-emerald-500 mb-6">
-              ฿{parseFloat(product.price).toLocaleString()}
-            </div>
+          {/* 🎯 จุดที่ 2: ดักจับปุ่ม Add To Cart */}
+          <div className="mt-8">
             <button
               onClick={handleAddToCart}
-              className="w-full bg-orange-500 text-white font-bold py-3 px-6 rounded-xl text-lg hover:bg-orange-600 transition-colors active:scale-98 duration-100 shadow-md"
+              disabled={isOutOfStock || isAdding} // 💡 ถ้าของหมด หรือกำลังกดแอด ให้ปิดปุ่ม (disabled)
+              className={`w-full font-bold py-3 px-6 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 ${
+                isOutOfStock
+                  ? "bg-gray-200 text-gray-400 cursor-not-allowed shadow-none" // สไตล์ตอนของหมด
+                  : "bg-emerald-600 hover:bg-emerald-700 text-white" // สไตล์ตอนปกติ
+              }`}
             >
-              🛒 เพิ่มลงตะกร้าสินค้า
+              {isAdding
+                ? "⏳ กำลังเพิ่มลงตะกร้า..."
+                : isOutOfStock
+                  ? "❌ สินค้าหมดสต็อก"
+                  : "🛒 เพิ่มลงตะกร้าสินค้า"}
             </button>
           </div>
         </div>

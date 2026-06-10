@@ -26,6 +26,7 @@ function Login() {
       // save token to storage
       localStorage.setItem("access_token", data.access);
       localStorage.setItem("refresh_token", data.refresh);
+      localStorage.setItem("username", username);
 
       alert("🎉 เข้าสู่ระบบสำเร็จแล้วครับ!");
       window.location.href = "/"; // กลับไปหน้าแรก
