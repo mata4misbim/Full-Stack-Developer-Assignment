@@ -18,6 +18,26 @@ REST API สำหรับระบบ Marketplace ระหว่าง Seller
 
 ---
 
+# Testing
+
+The backend includes unit tests for critical application flows.
+
+Test coverage includes:
+
+- User authentication
+- Product creation
+- Cart functionality
+- Order checkout flow
+- Inventory stock updates
+
+Run tests using:
+
+```bash
+python manage.py test
+```
+
+The tests focus on validating critical business logic and API behavior.
+
 # Project Structure
 
 ```bash
