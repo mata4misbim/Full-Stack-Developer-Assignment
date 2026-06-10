@@ -137,6 +137,12 @@ CORS_ALLOW_ALL_ORIGINS = True
 # กัน Djongo เลือก User เริ่มต้นที่ไม่มีฟิลด์
 AUTH_USER_MODEL = 'users.User'
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
 import os  # import os 
 
 # กำหนด URL ของรูปภาพเวลาเรียกผ่านเว็บเบราว์เซอร์ สร้างโฟล์เดอขึ้นเองเพื่อมาเก็บไฟล์ภาพ

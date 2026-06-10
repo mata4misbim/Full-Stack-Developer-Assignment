@@ -2,6 +2,12 @@ import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { BASE_URL } from "../api";
 
+const getImageUrl = (image) => {
+  if (!image) return "";
+  if (image.startsWith("http://") || image.startsWith("https://")) return image;
+  return `${BASE_URL}${image.startsWith("/") ? "" : "/"}${image}`;
+};
+
 function ProductDetail() {
   const { id } = useParams(); // ดึง ID ออกมาจาก URL พาท
   const [product, setProduct] = useState(null);
@@ -40,7 +46,26 @@ function ProductDetail() {
         },
         body: JSON.stringify({ product_id: product.id, quantity: 1 }),
       });
-      if (!response.ok) throw new Error("เพิ่มลงตะกร้าล้มเหลว");
+      if (!response.ok) {
+        let errMsg = "เพิ่มลงตะกร้าล้มเหลว";
+        try {
+          const data = await response.json();
+          errMsg =
+            data.detail || data.error || data.message || JSON.stringify(data);
+        } catch {
+          try {
+            errMsg = await response.text();
+          } catch {
+            /* ignore */
+          }
+        }
+        if (response.status === 401) {
+          alert("เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่");
+          window.location.href = "/login";
+          return;
+        }
+        throw new Error(errMsg);
+      }
       alert("✨ เพิ่มสินค้าลงตะกร้าเรียบร้อย!");
     } catch (error) {
       alert(error.message);
@@ -74,7 +99,7 @@ function ProductDetail() {
         <div className="w-full h-80 md:h-96 bg-gray-50 rounded-xl overflow-hidden flex items-center justify-center">
           {product.image ? (
             <img
-              src={product.image}
+              src={getImageUrl(product.image)}
               alt={product.title}
               className="w-full h-full object-cover"
             />

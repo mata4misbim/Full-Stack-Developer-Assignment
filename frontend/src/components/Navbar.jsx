@@ -32,7 +32,7 @@ function Navbar() {
           fontWeight: "bold",
         }}
       >
-        🏬 StoreFront
+        StoreFront
       </Link>
 
       <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>

@@ -34,7 +34,7 @@ class OrderListCreateView(generics.ListCreateAPIView):
                 order=order,
                 product=item.product,
                 quantity=item.quantity,
-                price_at_purchase=item.product.price
+                unit_price=item.product.price
             )
 
         # 4. อัปเดตยอดรวมราคาสุทธิที่แท้จริงลงในบิลหลัก
