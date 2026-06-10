@@ -427,15 +427,30 @@ Authorization: Bearer <access_token>
 
 # API Communication
 
-The project uses the native Fetch API for backend communication.
+The frontend communicates with the backend using the native Fetch API.
 
-Example request:
+A centralized API configuration is used to:
 
-```javascript id="8jlwm8"
-const response = await fetch("http://localhost:8000/api/products/");
+- manage the backend base URL
+- attach JWT access tokens automatically
+- simplify authenticated requests
 
-const data = await response.json();
+Example configuration:
+
+```javascript id="jlwmapi"
+export const BASE_URL = "http://127.0.0.1:8000";
+
+export const getAuthHeaders = () => {
+  const token = localStorage.getItem("access_token");
+
+  return {
+    "Content-Type": "application/json",
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+};
 ```
+
+This approach helps reduce duplicated request logic across the application.
 
 ---
 
