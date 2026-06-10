@@ -42,6 +42,11 @@ function Navbar() {
         <Link to="/cart" style={{ color: "white", textDecoration: "none" }}>
           🛒 ตะกร้า
         </Link>
+        {isLoggedIn && (
+          <Link to="/orders" className="text-white no-underline">
+            📜 ประวัติการสั่งซื้อ
+          </Link>
+        )}
 
         {isLoggedIn ? (
           <button

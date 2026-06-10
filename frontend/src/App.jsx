@@ -4,7 +4,8 @@ import ProductList from "./pages/ProductList";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Cart from "./pages/Cart";
-import ProductDetail from "./pages/ProductDetail"; // Import หน้าเว็บใหม่เข้ามา
+import ProductDetail from "./pages/ProductDetail";
+import OrderHistory from "./pages/OrderHistory";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/cart" element={<Cart />} />
         {/*เพิ่มเส้นทางแบบ Dynamic Param ด้วย :id */}
         <Route path="/products/:id" element={<ProductDetail />} />
+        <Route path="/orders" element={<OrderHistory />} />
       </Routes>
     </Router>
   );
