@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { BASE_URL } from "../api";
-import ProductCard from "../components/ProductCard"; // ดึง Component การ์ดมาใช้
+import ProductCard from "../components/ProductCard";
 
 function ProductList() {
   const [products, setProducts] = useState([]);
@@ -25,7 +25,7 @@ function ProductList() {
   const handleAddToCart = async (productId) => {
     const token = localStorage.getItem("access_token");
     if (!token) {
-      alert("❌ กรุณาเข้าสู่ระบบก่อนเลือกซื้อสินค้าครับ!");
+      alert("กรุณาเข้าสู่ระบบก่อนเลือกซื้อสินค้าครับ!");
       window.location.href = "/login";
       return;
     }
@@ -60,7 +60,7 @@ function ProductList() {
         }
         throw new Error(errMsg);
       }
-      alert("✨ เพิ่มสินค้าลงตะกร้าเรียบร้อยแล้วครับ!");
+      alert("เพิ่มสินค้าลงตะกร้าเรียบร้อยแล้วครับ!");
     } catch (error) {
       alert(error.message);
     }
@@ -69,27 +69,45 @@ function ProductList() {
   if (loading) {
     return (
       <h2 className="text-center text-xl font-bold mt-12 text-gray-700">
-        📦 กำลังโหลดสินค้าเด็ดๆ...
+        กำลังโหลดสินค้าเด็ดๆ...
       </h2>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <h1 className="text-center text-3xl font-extrabold text-gray-900 mb-8">
-        StoreFront Market
-      </h1>
-
-      {/* ส่งข้อมูลเข้าไปเจาะลูปในการ์ดแยกชิ้น */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {products.map((product) => (
-          <ProductCard
-            key={product.id}
-            product={product}
-            onAddToCart={handleAddToCart}
-          />
-        ))}
+    <div className="max-w-7xl mx-auto px-4 py-16">
+      {/* webpage */}
+      <div className="mb-12 text-center">
+        <h1 className="text-4xl font-black text-slate-900 tracking-tight">
+          Explore Our Store
+        </h1>
       </div>
+
+      {/* โชว์สินค้า */}
+      {loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+          {[...Array(8)].map((_, i) => (
+            <div
+              key={i}
+              className="h-80 bg-slate-100 rounded-3xl animate-pulse"
+            />
+          ))}
+        </div>
+      ) : products.length === 0 ? (
+        <div className="text-center py-20">
+          <p className="text-slate-400 font-bold">ยังไม่มีสินค้าในขณะนี้</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+          {products.map((product) => (
+            <ProductCard
+              key={product.id}
+              product={product}
+              onAddToCart={handleAddToCart}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

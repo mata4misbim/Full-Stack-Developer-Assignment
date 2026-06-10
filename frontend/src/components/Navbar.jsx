@@ -60,7 +60,7 @@ function Navbar() {
             </>
           )}
 
-          <span className="h-4 w-[1px] bg-slate-800 hidden sm:block"></span>
+          <span className="h-4 w-1px bg-slate-800 hidden sm:block"></span>
 
           {isLoggedIn ? (
             <button

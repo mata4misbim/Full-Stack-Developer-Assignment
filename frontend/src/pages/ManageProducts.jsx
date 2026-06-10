@@ -17,10 +17,10 @@ function ManageProducts() {
   const [editMode, setEditMode] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState(null);
 
-  // State เก็บค่าข้อมูลฟอร์ม (💡 เพิ่ม quantity สต็อกสินค้า)
+  // State เก็บค่าข้อมูลฟอร์ม (เพิ่ม quantity สต็อกสินค้า)
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState("");
-  const [quantity, setQuantity] = useState(""); // 👈 เพิ่ม State สต็อก
+  const [quantity, setQuantity] = useState(""); // State สต็อก
   const [description, setDescription] = useState("");
   const [image, setImage] = useState(null);
   const [saveLoading, setSaveLoading] = useState(false);
@@ -64,7 +64,7 @@ function ManageProducts() {
   const resetForm = () => {
     setTitle("");
     setPrice("");
-    setQuantity(""); // 👈 รีเซ็ตค่าสต็อก
+    setQuantity(""); // รีเซ็ตค่าสต็อก
     setDescription("");
     setImage(null);
     setSelectedProductId(null);
@@ -77,7 +77,7 @@ function ManageProducts() {
     setSelectedProductId(product.id);
     setTitle(product.title);
     setPrice(product.price);
-    setQuantity(product.quantity || 0); // 👈 ดึงค่าจำนวนสต็อกเดิมมาใส่ฟอร์มแก้
+    setQuantity(product.quantity || 0); // ดึงค่าจำนวนสต็อกเดิมมาใส่ฟอร์มแก้
     setDescription(product.description || "");
     setImage(null);
     setIsModalOpen(true);
@@ -89,7 +89,7 @@ function ManageProducts() {
 
     if (!token) {
       alert(
-        "🔒 เซสชันหมดอายุหรือคุณยังไม่ได้เข้าสู่ระบบ กรุณา Login ใหม่ก่อนครับ",
+        "เซสชันหมดอายุหรือคุณยังไม่ได้เข้าสู่ระบบ กรุณา Login ใหม่ก่อนครับ",
       );
       return;
     }
@@ -98,7 +98,7 @@ function ManageProducts() {
     const formData = new FormData();
     formData.append("title", title);
     formData.append("price", Number(price));
-    formData.append("quantity", Number(quantity)); // 👈 🎯 ส่งค่าจำนวนสินค้าไปให้ Django ตามที่ระบบร้องขอ
+    formData.append("quantity", Number(quantity)); //ส่งค่าจำนวนสินค้าไปให้ Django
     formData.append("description", description);
     if (image) {
       formData.append("image", image);
@@ -122,7 +122,7 @@ function ManageProducts() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error("❌ หลังบ้านส่ง Error มาว่า:", errorData);
+        console.error("Error:", errorData);
 
         const errorMessages = Object.entries(errorData)
           .map(([key, value]) => `${key}: ${value}`)
@@ -133,8 +133,8 @@ function ManageProducts() {
 
       alert(
         editMode
-          ? "✏️ อัปเดตข้อมูลสินค้าเรียบร้อย!"
-          : "🚀 เพิ่มสินค้าใหม่เข้าหน้าร้านสำเร็จ!",
+          ? "อัปเดตข้อมูลสินค้าเรียบร้อย!"
+          : "เพิ่มสินค้าใหม่เข้าหน้าร้านสำเร็จ!",
       );
       resetForm();
 
@@ -157,15 +157,14 @@ function ManageProducts() {
         console.error("Error refreshing products:", e);
       }
     } catch (error) {
-      alert(`⚠️ ลงขายไม่ได้เนื่องจาก:\n${error.message}`);
+      alert(`ลงขายไม่ได้เนื่องจาก:\n${error.message}`);
     } finally {
       setSaveLoading(false);
     }
   };
 
   const handleDeleteProduct = async (productId) => {
-    if (!window.confirm("⚠️ คุณโอแน่ใจนะว่าจะลบสินค้าชิ้นนี้ออกจากหน้าร้าน?"))
-      return;
+    if (!window.confirm("แน่ใจนะว่าจะลบสินค้าชิ้นนี้ออกจากหน้าร้าน?")) return;
     const token = localStorage.getItem("access_token");
 
     try {
@@ -177,64 +176,64 @@ function ManageProducts() {
       if (!response.ok) throw new Error("ลบสินค้าล้มเหลว");
 
       setMyProducts(myProducts.filter((p) => p.id !== productId));
-      alert("🗑️ ลบสินค้าออกจากระบบเรียบร้อยครับ!");
+      alert("ลบสินค้าออกจากระบบเรียบร้อยครับ!");
     } catch (error) {
       alert(error.message);
     }
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-10 relative">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-extrabold text-gray-900 flex items-center gap-2">
-          🏬 หน้าจัดการร้านค้าของคุณ ({myProducts.length})
-        </h1>
+    <div className="max-w-5xl mx-auto px-4 py-12">
+      {/* Header สไตล์สะอาดตา */}
+      <div className="flex justify-between items-end mb-10">
+        <div>
+          <h1 className="text-3xl font-black text-slate-900 tracking-tight">
+            คลังสินค้าของคุณ
+          </h1>
+          <p className="text-slate-500 mt-2 font-medium">
+            จัดการสต็อกและข้อมูลสินค้าทั้งหมดในร้าน
+          </p>
+        </div>
         <button
           onClick={() => {
             setEditMode(false);
             setIsModalOpen(true);
           }}
-          className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-5 rounded-xl shadow transition-colors flex items-center gap-1"
+          className="bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 px-6 rounded-2xl shadow-lg shadow-emerald-600/20 transition-all hover:-translate-y-0.5 active:scale-95"
         >
-          ➕ เพิ่มสินค้าใหม่
+          + ลงขายสินค้าใหม่
         </button>
       </div>
 
       {loading ? (
-        <h2 className="text-center text-xl font-bold mt-12 text-gray-400 animate-pulse">
-          กำลังโหลดข้อมูลหน้าร้านค้า...
-        </h2>
+        <div className="text-center py-20 text-slate-400 font-bold">
+          กำลังโหลดคลังสินค้า...
+        </div>
       ) : myProducts.length === 0 ? (
-        <div className="bg-white rounded-2xl p-12 text-center border border-gray-100 shadow-sm">
-          <p className="text-gray-400 text-lg mb-2">
-            ไม่พบสินค้าของร้านคุณในระบบขณะนี้
-          </p>
-          <p className="text-sm text-gray-400">
-            ลองตรวจสอบเซสชันหรือเพิ่มสินค้าลงคลังใหม่ดูนะครับ
-          </p>
+        <div className="bg-white rounded-3xl p-16 text-center border border-slate-100 shadow-sm">
+          <div className="text-5xl mb-4">📦</div>
+          <p className="text-slate-400 text-lg">ยังไม่มีสินค้าในคลัง</p>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full text-left">
               <thead>
-                <tr className="bg-gray-50 border-b border-gray-100 text-gray-600 text-sm font-semibold">
-                  <th className="p-4">รูปภาพ</th>
-                  <th className="p-4">ชื่อสินค้า</th>
-                  <th className="p-4">ราคา</th>
-                  <th className="p-4">จำนวนในคลัง</th>{" "}
-                  {/* 💡 วาดหัวตารางเพิ่ม */}
-                  <th className="p-4 text-center">จัดการ</th>
+                <tr className="bg-slate-50 text-slate-400 text-xs font-bold uppercase tracking-wider">
+                  <th className="p-6">สินค้า</th>
+                  <th className="p-6">ราคา</th>
+                  <th className="p-6">สต็อก</th>
+                  <th className="p-6 text-center">จัดการ</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="divide-y divide-slate-50">
                 {myProducts.map((product) => (
                   <tr
                     key={product.id}
-                    className="hover:bg-gray-50/50 transition-colors"
+                    className="hover:bg-slate-50/50 transition-colors"
                   >
-                    <td className="p-4">
-                      <div className="w-14 h-14 bg-gray-100 rounded-lg overflow-hidden shrink-0 flex items-center justify-center border border-gray-100">
+                    <td className="p-4 flex items-center gap-4">
+                      <div className="w-14 h-14 bg-slate-100 rounded-2xl overflow-hidden shrink-0 border border-slate-200">
                         {product.image ? (
                           <img
                             src={getImageUrl(product.image)}
@@ -242,44 +241,41 @@ function ManageProducts() {
                             className="w-full h-full object-cover"
                           />
                         ) : (
-                          <span className="text-[10px] text-gray-400">
+                          <div className="w-full h-full flex items-center justify-center text-[10px] text-slate-400">
                             ไม่มีรูป
-                          </span>
+                          </div>
                         )}
                       </div>
-                    </td>
-                    <td className="p-4">
                       <div>
-                        <h3 className="font-bold text-gray-900 line-clamp-1">
+                        <h3 className="font-bold text-slate-900">
                           {product.title}
                         </h3>
-                        <p className="text-xs text-gray-400 line-clamp-1 mt-0.5">
+                        <p className="text-xs text-slate-400 line-clamp-1">
                           {product.description}
                         </p>
                       </div>
                     </td>
-                    <td className="p-4 font-bold text-gray-900">
+                    <td className="p-4 font-bold text-slate-900">
                       ฿{parseFloat(product.price).toLocaleString()}
                     </td>
-                    <td className="p-4 text-gray-700 font-medium">
-                      {product.quantity !== undefined
-                        ? `${product.quantity} ชิ้น`
-                        : "ไม่ระบุ"}{" "}
-                      {/* 💡 แสดงจำนวนคลังสินค้า */}
+                    <td className="p-4">
+                      <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-lg font-bold text-xs">
+                        {product.quantity || 0} ชิ้น
+                      </span>
                     </td>
                     <td className="p-4">
                       <div className="flex items-center gap-2 justify-center">
                         <button
                           onClick={() => handleEditClick(product)}
-                          className="bg-amber-50 hover:bg-amber-100 text-amber-700 text-xs font-bold py-2 px-3 rounded-lg transition-colors"
+                          className="bg-amber-50 hover:bg-amber-100 text-amber-700 text-xs font-black py-2.5 px-4 rounded-xl transition-all"
                         >
-                          ✏️ แก้ไข
+                          แก้ไข
                         </button>
                         <button
                           onClick={() => handleDeleteProduct(product.id)}
-                          className="bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold py-2 px-3 rounded-lg transition-colors"
+                          className="bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-black py-2.5 px-4 rounded-xl transition-all"
                         >
-                          🗑️ ลบ
+                          ลบ
                         </button>
                       </div>
                     </td>
@@ -291,7 +287,7 @@ function ManageProducts() {
         </div>
       )}
 
-      {/* 🎯 ส่ง Props สต็อกเพิ่มเติมเข้าป๊อปอัปแชร์ฟอร์ม */}
+      {/* ส่ง Props สต็อกเพิ่มเติมเข้าป๊อปอัปแชร์ฟอร์ม */}
       <ProductModal
         isOpen={isModalOpen}
         editMode={editMode}
@@ -301,8 +297,8 @@ function ManageProducts() {
         setTitle={setTitle}
         price={price}
         setPrice={setPrice}
-        quantity={quantity} // 👈 ส่งสิทธิ์รับค่าสต็อกเข้า Modal
-        setQuantity={setQuantity} // 👈 ส่งฟังก์ชันแก้ไขค่าสต็อกเข้า Modal
+        quantity={quantity} // ส่งสิทธิ์รับค่าสต็อกเข้า Modal
+        setQuantity={setQuantity} // ส่งฟังก์ชันแก้ไขค่าสต็อกเข้า Modal
         description={description}
         setDescription={setDescription}
         setImage={setImage}

@@ -11,9 +11,11 @@ function CartProductCard({ item, onUpdateQuantity, onRemoveItem }) {
   const title = details.title || "สินค้าไม่ระบุชื่อ";
   const price = parseFloat(details.price || item.unit_price || 0);
   const image = details.image || item.product_image;
+  const available = details.quantity ?? item.product_quantity ?? Infinity;
 
   return (
     <div className="flex items-center gap-5 bg-white rounded-2xl p-4 border border-slate-100 shadow-sm hover:border-emerald-100 transition-all">
+      {/* รูปสินค้า */}
       <div className="w-20 h-20 bg-slate-50 rounded-xl overflow-hidden shrink-0 border border-slate-100">
         {image ? (
           <img
@@ -28,6 +30,7 @@ function CartProductCard({ item, onUpdateQuantity, onRemoveItem }) {
         )}
       </div>
 
+      {/* ข้อมูลสินค้า */}
       <div className="flex-1 min-w-0">
         <h3 className="font-bold text-slate-900 truncate">{title}</h3>
         <p className="text-sm font-semibold text-emerald-600 mt-1">
@@ -35,27 +38,46 @@ function CartProductCard({ item, onUpdateQuantity, onRemoveItem }) {
         </p>
       </div>
 
-      <div className="flex items-center gap-4">
+      {/* ควบคุมจำนวนสินค้า */}
+      <div className="flex items-center gap-3">
         <div className="flex items-center bg-slate-50 rounded-xl p-1 border border-slate-100">
           <button
-            onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
-            disabled={item.quantity <= 1}
-            className="w-8 h-8 flex items-center justify-center text-slate-500 hover:bg-white hover:text-emerald-600 rounded-lg transition-all disabled:opacity-30 font-bold"
+            onClick={() =>
+              onUpdateQuantity(item.id, Math.max(1, item.quantity - 1))
+            }
+            className="w-8 h-8 flex items-center justify-center text-slate-500 hover:bg-white hover:text-emerald-600 rounded-lg transition-all font-bold"
           >
             -
           </button>
-          <span className="w-10 text-center text-sm font-bold text-slate-900">
-            {item.quantity}
-          </span>
+
+          <input
+            type="number"
+            min="1"
+            value={item.quantity}
+            onChange={(e) => {
+              const val = parseInt(e.target.value);
+              if (!isNaN(val) && val > 0) onUpdateQuantity(item.id, val);
+            }}
+            className="w-12 text-center text-sm font-bold text-slate-900 bg-transparent focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          />
+
           <button
-            onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
-            className="w-8 h-8 flex items-center justify-center text-slate-500 hover:bg-white hover:text-emerald-600 rounded-lg transition-all font-bold"
+            onClick={() =>
+              onUpdateQuantity(item.id, Math.min(available, item.quantity + 1))
+            }
+            disabled={item.quantity >= available}
+            title={
+              item.quantity >= available
+                ? `เหลือในสต็อก ${available} ชิ้น`
+                : "เพิ่มหนึ่งชิ้น"
+            }
+            className={`w-8 h-8 flex items-center justify-center rounded-lg transition-all font-bold ${item.quantity >= available ? "text-slate-300 cursor-not-allowed" : "text-slate-500 hover:bg-white hover:text-emerald-600"}`}
           >
             +
           </button>
         </div>
 
-        {/* ปุ่มลบ*/}
+        {/* ปุ่มลบ */}
         <button
           onClick={() => onRemoveItem(item.id)}
           className="text-slate-300 hover:text-rose-500 p-2 rounded-lg hover:bg-rose-50 transition-colors"

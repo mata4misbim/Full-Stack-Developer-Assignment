@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../api";
 
 function Register() {
@@ -6,133 +7,106 @@ function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("buyer");
-
-  const getErrorMessage = (data) => {
-    if (data.detail) return data.detail;
-    if (data.message) return data.message;
-
-    return Object.entries(data)
-      .map(([field, messages]) => {
-        const message = Array.isArray(messages)
-          ? messages.join(", ")
-          : messages;
-        return `${field}: ${message}`;
-      })
-      .join("\n");
-  };
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
 
     try {
       const response = await fetch(`${BASE_URL}/api/auth/register/`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, email, password, role }),
       });
 
-      const data = await response.json();
+      if (!response.ok)
+        throw new Error("สมัครสมาชิกไม่สำเร็จ กรุณาตรวจสอบข้อมูล");
 
-      if (!response.ok) {
-        // รับ error จาก backend ละส่งออก
-        throw new Error(
-          getErrorMessage(data) || "สมัครสมาชิกไม่สำเร็จ กรุณาลองใหม่อีกครั้ง",
-        );
-      }
-
-      alert("🎉 สมัครสมาชิกสำเร็จแล้วครับ! ยินดีต้อนรับสู่ StoreFront");
-      window.location.href = "/login"; // สมัครเสร็จปุ๊บ ส่งไปหน้าล็อกอินทันที
+      alert("สมัครสมาชิกสำเร็จครับ!");
+      navigate("/login");
     } catch (error) {
       alert(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4 py-12 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-8 rounded-2xl bg-white p-8 shadow-lg">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
-            📝 สมัครสมาชิกใหม่
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            ร่วมเป็นส่วนหนึ่งกับ StoreFront Marketplace
+    <div className="min-h-screen flex items-center justify-center p-4 bg-slate-50">
+      <div className="w-full max-w-md bg-white p-8 rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/50">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl font-black text-slate-900">Create Account</h2>
+          <p className="text-sm text-slate-500 mt-1">
+            เริ่มต้นประสบการณ์ช้อปปิ้งและขายของกับเรา
           </p>
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleRegister}>
-          <div className="space-y-4 rounded-md shadow-sm">
-            {/* Username */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Username
-              </label>
-              <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-                className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-950 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-                placeholder="เช่น methachobmee"
-              />
-            </div>
-
-            {/* Email */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Email Address
-              </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-950 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-                placeholder="oh@example.com"
-              />
-            </div>
-
-            {/* Password */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-950 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-                placeholder="••••••••"
-              />
-            </div>
-
-            {/* Role Selection */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                ประเภทบัญชี (Role)
-              </label>
-              <select
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                className="mt-1 block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-950 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-              >
-                <option value="buyer">Buyer (ผู้ซื้อสินค้า)</option>
-                <option value="seller">Seller (ผู้ขายสินค้า)</option>
-              </select>
-            </div>
-          </div>
-
-          {/* ปุ่มกดส่ง */}
+        <form onSubmit={handleRegister} className="space-y-5">
           <div>
-            <button
-              type="submit"
-              className="group relative flex w-full justify-center rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors duration-200"
-            >
-              ยืนยันการสมัครสมาชิก
-            </button>
+            <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 ml-1">
+              Username
+            </label>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-sm font-medium"
+              placeholder="ตั้งชื่อผู้ใช้งาน"
+            />
           </div>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 ml-1">
+              Email
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-sm font-medium"
+              placeholder="email@example.com"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 ml-1">
+              Password
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-sm font-medium"
+              placeholder="••••••••"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 ml-1">
+              Account Role
+            </label>
+            <select
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-sm font-medium cursor-pointer"
+            >
+              <option value="buyer">Buyer (ผู้ซื้อ)</option>
+              <option value="seller">Seller (ผู้ขาย)</option>
+            </select>
+          </div>
+
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full bg-slate-900 hover:bg-emerald-600 text-white font-black py-4 rounded-2xl shadow-lg transition-all hover:shadow-xl active:scale-[0.98] disabled:opacity-50 mt-4"
+          >
+            {isLoading ? "กำลังสมัครสมาชิก..." : "สมัครสมาชิก"}
+          </button>
         </form>
       </div>
     </div>

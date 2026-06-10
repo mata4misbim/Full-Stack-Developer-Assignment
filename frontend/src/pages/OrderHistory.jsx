@@ -38,7 +38,7 @@ function OrderHistory() {
     return (
       <div className="max-w-md mx-auto my-16 p-8 text-center bg-white rounded-2xl shadow border border-gray-100">
         <h2 className="text-2xl font-bold text-gray-900 mb-3">
-          🔒 กรุณาเข้าสู่ระบบ
+          กรุณาเข้าสู่ระบบ
         </h2>
         <p className="text-gray-500">
           คุณต้องเข้าสู่ระบบเพื่อดูประวัติการสั่งซื้อของคุณ
@@ -50,98 +50,91 @@ function OrderHistory() {
   if (loading) {
     return (
       <h2 className="text-center text-xl font-bold mt-12 text-gray-700">
-        📦 กำลังโหลดประวัติการสั่งซื้อ...
+        กำลังโหลดประวัติการสั่งซื้อ...
       </h2>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-10">
-      <h1 className="text-3xl font-extrabold text-gray-900 mb-8">
-        🧾 ประวัติการสั่งซื้อของคุณ
-      </h1>
+    <div className="max-w-3xl mx-auto px-4 py-12">
+      <div className="mb-10">
+        <h1 className="text-3xl font-black text-slate-900">
+          ประวัติการสั่งซื้อ
+        </h1>
+        <p className="text-slate-500 mt-2">รายการคำสั่งซื้อย้อนหลังของคุณ</p>
+      </div>
 
       {orders.length === 0 ? (
-        <div className="bg-white rounded-2xl p-12 text-center border border-gray-100 shadow-sm">
-          <p className="text-gray-400 text-lg">
-            คุณยังไม่เคยมีประวัติการสั่งซื้อสินค้า
-          </p>
+        <div className="bg-white rounded-3xl p-16 text-center border border-slate-100 shadow-sm">
+          <div className="text-5xl mb-4">📜</div>
+          <p className="text-slate-400">ยังไม่มีรายการสั่งซื้อในขณะนี้</p>
         </div>
       ) : (
         <div className="space-y-6">
           {orders.map((order) => (
             <div
               key={order.id}
-              className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm space-y-4"
+              className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm hover:shadow-md transition-shadow"
             >
-              {/* หัวบิล */}
-              <div className="flex flex-wrap justify-between items-center border-b pb-3 gap-2">
+              {/* Header บิล */}
+              <div className="flex justify-between items-start mb-6">
                 <div>
-                  <span className="text-sm text-gray-400">เลขที่ออเดอร์:</span>
-                  <span className="font-mono font-bold text-gray-900 ml-1">
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                    Order ID
+                  </p>
+                  <p className="font-mono font-bold text-slate-900 text-lg">
                     #{order.id}
-                  </span>
+                  </p>
                 </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-sm text-gray-500">
+                <div className="text-right">
+                  <span className="block text-sm font-semibold text-slate-900">
                     {order.created_at
                       ? new Date(order.created_at).toLocaleDateString("th-TH", {
                           year: "numeric",
                           month: "long",
                           day: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
                         })
-                      : "ไม่ระบุวันที่"}
+                      : "-"}
                   </span>
-                  <span className="bg-amber-50 text-amber-700 text-xs px-2.5 py-1 rounded-full font-semibold">
-                    {order.status || "รอดำเนินการ"}
+                  <span className="inline-block mt-1 bg-emerald-50 text-emerald-700 text-[10px] px-3 py-1 rounded-full font-black uppercase tracking-wider">
+                    {order.status || "Completed"}
                   </span>
                 </div>
               </div>
 
-              {/* รายการสินค้าในบิลนั้นๆ (ถ้าแบคเอนด์ส่งมาเป็น Nested Array) */}
-
+              {/* รายการสินค้า */}
               {order.items && order.items.length > 0 && (
-                <div className="divide-y divide-gray-100 bg-gray-50 rounded-lg p-3 space-y-2">
+                <div className="space-y-3 mb-6">
                   {order.items.map((item) => {
-                    // 🎯 เจาะเข้าก้อนข้อมูลหลักที่แบคเอนด์ส่งมา
                     const details = item.product_details || {};
-
-                    // 🎯 ดึงข้อมูลชื่อสินค้า และราคาต่อชิ้นให้ถูกตัว
                     const title = details.title || "สินค้าไม่ระบุชื่อ";
                     const price = parseFloat(
                       details.price || item.unit_price || 0,
                     );
-
                     return (
                       <div
                         key={item.id}
-                        className="flex justify-between py-2 text-sm text-gray-700"
+                        className="flex justify-between items-center text-sm"
                       >
-                        <div className="flex items-center gap-2">
-                          {/* แสดงชื่อสินค้าจริงตามตาราง Object */}
-                          <span className="font-medium text-gray-900">
-                            {title}
-                          </span>
-                          <span className="text-gray-400 text-xs">
+                        <div className="flex items-center gap-3">
+                          <span className="text-slate-400 font-medium">
                             x{item.quantity}
                           </span>
+                          <span className="text-slate-700">{title}</span>
                         </div>
-                        <div className="font-semibold text-gray-900">
-                          {/* คำนวณราคารวมของไอเทมชิ้นนี้ (ราคา x จำนวน) */}฿
-                          {(price * item.quantity).toLocaleString()}
-                        </div>
+                        <span className="font-semibold text-slate-900">
+                          ฿{(price * item.quantity).toLocaleString()}
+                        </span>
                       </div>
                     );
                   })}
                 </div>
               )}
 
-              {/* ยอดรวมท้ายบิล */}
-              <div className="flex justify-end items-center gap-2 pt-2 border-t">
-                <span className="text-gray-500 text-sm">ราคารวมทั้งหมด:</span>
-                <span className="text-xl font-black text-indigo-600">
+              {/* ยอดรวม */}
+              <div className="flex justify-between items-center pt-6 border-t border-slate-100">
+                <span className="text-slate-500 font-medium">ยอดชำระสุทธิ</span>
+                <span className="text-2xl font-black text-emerald-600">
                   ฿{parseFloat(order.total_price || 0).toLocaleString()}
                 </span>
               </div>

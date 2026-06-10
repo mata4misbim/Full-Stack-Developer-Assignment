@@ -30,10 +30,11 @@ function Cart() {
   };
 
   useEffect(() => {
-    fetchCartItems();
+    const load = async () => await fetchCartItems();
+    load();
   }, []);
 
-  // ฟังก์ชันสำหรับอัปเดตจำนวนชิ้นสินค้า
+  // อัปเดตจำนวน
   const handleUpdateQuantity = async (cartItemId, newQuantity) => {
     if (newQuantity < 1) return;
     const token = localStorage.getItem("access_token");
@@ -41,25 +42,54 @@ function Cart() {
     const targetItem = cartItems.find((item) => item.id === cartItemId);
     if (!targetItem) return;
 
-    // ดึง product_id
-    const productId = targetItem.product || targetItem.product_details?.id;
+    const available =
+      targetItem.product_details?.quantity ??
+      targetItem.product_quantity ??
+      Infinity;
+
+    // Prevent increasing beyond available stock
+    if (newQuantity > available) {
+      alert(`ไม่สามารถเพิ่มเกินสต็อกได้ (เหลือ ${available} ชิ้น)`);
+      return;
+    }
+
+    const delta = newQuantity - targetItem.quantity;
 
     try {
-      const response = await fetch(`${BASE_URL}/api/cart/`, {
-        method: "POST", // อัพเดททุกฟิล
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          product_id: productId,
-          quantity: 1,
-        }),
-      });
+      if (delta > 0) {
+        // send delta to create endpoint to increment
+        const productId = targetItem.product || targetItem.product_details?.id;
+        const resp = await fetch(`${BASE_URL}/api/cart/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ product_id: productId, quantity: delta }),
+        });
+        if (!resp.ok) {
+          const data = await resp.json().catch(() => null);
+          throw new Error(
+            data?.error || data?.detail || "ไม่สามารถเพิ่มจำนวนได้",
+          );
+        }
+      } else if (delta < 0) {
+        // set the new quantity via PATCH on the cart item
+        const resp = await fetch(`${BASE_URL}/api/cart/${cartItemId}/`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ quantity: newQuantity }),
+        });
+        if (!resp.ok) {
+          const data = await resp.json().catch(() => null);
+          throw new Error(data?.error || data?.detail || "ไม่สามารถลดจำนวนได้");
+        }
+      }
 
-      if (!response.ok)
-        throw new Error("หลังบ้านไม่อนุญาตให้แก้ไขจำนวนด้วยวิธีนี้");
-
+      // update UI
       setCartItems(
         cartItems.map((item) =>
           item.id === cartItemId ? { ...item, quantity: newQuantity } : item,
@@ -96,7 +126,22 @@ function Cart() {
           Authorization: `Bearer ${token}`,
         },
       });
-      if (!response.ok) throw new Error("การสั่งซื้อสินค้าล้มเหลว");
+      if (!response.ok) {
+        let errMsg = "การสั่งซื้อสินค้าล้มเหลว";
+        try {
+          const data = await response.json();
+          errMsg =
+            data.detail || data.error || data.message || JSON.stringify(data);
+        } catch {
+          try {
+            errMsg = await response.text();
+          } catch {
+            /* ignore */
+          }
+        }
+        throw new Error(errMsg);
+      }
+
       alert("สั่งซื้อสินค้าสำเร็จเรียบร้อยครับ!");
       setCartItems([]);
     } catch (error) {

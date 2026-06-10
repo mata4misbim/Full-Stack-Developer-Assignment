@@ -4,6 +4,7 @@ from .models import Order, OrderItem
 from .serializers import OrderSerializer
 from cart.models import CartItem
 from django.db import transaction  # transaction ไว้เช็คสต๊อก
+from products.models import Product
 
 class OrderListCreateView(generics.ListCreateAPIView):
     serializer_class = OrderSerializer
@@ -21,49 +22,28 @@ class OrderListCreateView(generics.ListCreateAPIView):
         if not cart_items.exists():
             return Response({"error": "ไม่มีสินค้าในตะกร้า ไม่สามารถสั่งซื้อได้"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # transaction.atomic logic หักสต๊อก
+        # Use an atomic transaction and lock product rows to avoid race conditions
         with transaction.atomic():
-            
-            # ลูปสินค้าก่อน เผื่อหมดตอนกำลังซื้อ ---
-            for item in cart_items:
-                product = item.product
-                
-                # ถ้าสินค้าไม่มี หรือสต็อกเหลือน้อยกว่าจำนวนที่ลูกค้าจะซื้อ ให้โชว์ error
-                if product.quantity is None or product.quantity < item.quantity:
-                    return Response(
-                        {"error": f"ขออภัยครับ สินค้า '{product.title}' คงเหลือในคลังไม่พอ (เหลือเพียง {product.quantity or 0} ชิ้น)"}, 
-                        status=status.HTTP_400_BAD_REQUEST
-                    )
-
-            # เช็คแล้วหักสต๊อก ---
-            # สร้างใบสั่งซื้อหลักขึ้นมารอก่อน (ตั้งยอดเงินเริ่มต้นเป็น 0)
             order = Order.objects.create(buyer=buyer, total_price=0.00)
             total_price = 0
 
-            # ย้ายของจากตะกร้าเข้ามาในบิลใบสั่งซื้อ ยิงลูปทีละชิ้น
-            for item in cart_items:
-                product = item.product
-                
-                item_total = product.price * item.quantity
+            # iterate cart items and lock corresponding product rows
+            for item in cart_items.select_related('product'):
+                locked_product = Product.objects.select_for_update().get(pk=item.product.pk)
+
+                if locked_product.quantity < item.quantity:
+                    return Response({"error": f"ขออภัยครับ สินค้า '{locked_product.title}' คงเหลือในคลังไม่พอ (เหลือเพียง {locked_product.quantity} ชิ้น)"}, status=status.HTTP_400_BAD_REQUEST)
+
+                item_total = locked_product.price * item.quantity
                 total_price += item_total
 
-                # บันทึกข้อมูลลงตารางรายการสินค้าในบิล (OrderItem)
-                OrderItem.objects.create(
-                    order=order,
-                    product=product,
-                    quantity=item.quantity,
-                    unit_price=product.price
-                )
+                OrderItem.objects.create(order=order, product=locked_product, quantity=item.quantity, unit_price=locked_product.price)
 
-                #สกัดจุดหักสต็อก: ทำการลดจำนวนสินค้าในสต็อกตามที่ลูกค้ากดสั่งซื้อจริง
-                product.quantity -= item.quantity
-                product.save() # เซฟจำนวนสต็อกใหม่ลงฐานข้อมูลหลังบ้าน
+                locked_product.quantity -= item.quantity
+                locked_product.save()
 
-            #อัปเดตยอดรวมราคาสุทธิที่แท้จริงลงในบิลหลัก
             order.total_price = total_price
             order.save()
-
-            # สั่งล้างข้อมูลในตะกร้าสินค้าของ User คนนี้ให้เกลี้ยง (เพราะซื้อและตัดสต็อกเรียบร้อยแล้ว)
             cart_items.delete()
 
         # ส่งข้อมูลบิลที่สร้างสำเร็จกลับไปให้หน้าบ้านโชว์ความสำเร็จ
