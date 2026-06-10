@@ -2,7 +2,7 @@
 backend/venv/
 backend/.venv/
 venv/
-backend/.env/
+backend/.env
 
 
 
